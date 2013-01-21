@@ -1,0 +1,60 @@
+<?php
+/***************************************** PRODUCTION *****************************************/
+$prod = array(
+        'odm' => array(
+            'connection' => array(
+                'server' => '<serverhost>',
+                'options' => array(
+                    'persist'    => 'api',
+                    'replicaSet' => true, 
+                    'autoGenerateHydratorClasses'   => false,
+                    'autoGenerateProxyClasses'      => false,
+                    ),
+                ),
+            'options' => array(
+                'proxyDir'          => ROOT_PATH . '/var/tmp/cache',
+                'proxyNamespace'    => 'Proxies',
+                'hydratorDir'       => ROOT_PATH . '/var/tmp/cache',
+                'hydratorNamespace' => 'Hydrators',
+                'defaultDB'         => '<db name>',
+                ),
+            'reader' => array('defaultAnnotationNamespace' => 'Doctrine\ODM\MongoDB\Mapping\\'),
+            //'documents_path' => ROOT_PATH '/domain/documents',
+            ),
+
+        'orm' => array(
+                'options' => array('entities_path' => ROOT_PATH . '/app/domain/entities'),
+                'connection' => array(
+                    'driver'    => 'pdo_mysql',
+                    'user'      => '<production mysql user>',
+                    'password'  => '<production mysql password>',
+                    'dbname'    => '<your db name>',
+                    ),
+                ),
+        );
+
+
+/******************************************* STAGING *******************************************/
+$stage = $prod;
+
+
+/******************************************* TESTING *******************************************/
+$test = $prod;
+
+/***************************************** DEVELOPMENT *****************************************/
+$dev = $test;
+$dev['odm']['connection']['server'] = 'mongodb://localhost';
+$dev['odm']['connection']['options'] = array_merge( 
+        $prod['odm']['connection']['options'], 
+        array(
+            'replicaSet' => false,
+            'autoGenerateHydratorClasses' => true,
+            'autoGenerateProxyClasses' => true, 
+            )
+        );
+
+$dev['orm']['connection']['user']      = 'root';
+$dev['orm']['connection']['password']  = '';
+$dev['orm']['connection']['dbname']    = '<db name>';
+
+return array('development' => $dev, 'testing' => $test, 'staging' => $stage, 'production' => $prod);

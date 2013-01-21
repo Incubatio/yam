@@ -1,0 +1,32 @@
+{
+    "name": "migation",
+    "description": "Customizable command line tool for migration",
+    "type":"application",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Nicolas Morel",
+            "email": "work@incubatio.org"
+        }
+    ],
+    "config": {
+        "vendor-dir":"vendor",
+        "bin-dir":"bin"
+    },
+    "require": {
+        "doctrine/common":"2.3.*@stable",
+        "doctrine/mongodb-odm": "1.0.0-BETA7",
+        "doctrine/orm": "2.3.*@stable"
+    },
+    "autoload": {
+        "classmap": [
+            "lib",
+            "app/Services/Listeners",
+            "vendor/doctrine/common/lib",
+            "vendor/doctrine/dbal/lib",
+            "vendor/doctrine/orm/lib",
+            "vendor/doctrine/mongodb/lib",
+            "vendor/doctrine/mongodb-odm/lib"
+        ]
+    }
+}
