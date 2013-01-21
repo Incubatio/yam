@@ -1,6 +1,6 @@
 {
-    "name": "migation",
-    "description": "Customizable command line tool for migration",
+    "name": "incubatio/yam",
+    "description": "Yet Another Migrator: Flexible and customizable command line tool for migration with a trivial version management",
     "type":"application",
     "minimum-stability": "stable",
     "authors": [
@@ -14,6 +14,7 @@
         "bin-dir":"bin"
     },
     "require": {
+        "php": ">=5.3.0",
         "doctrine/common":"2.3.*@stable",
         "doctrine/mongodb-odm": "1.0.0-BETA7",
         "doctrine/orm": "2.3.*@stable"
