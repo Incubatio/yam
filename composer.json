@@ -1,7 +1,10 @@
 {
     "name": "incubatio/yam",
+    "type": "application",
+    "keywords": ["migration"],
     "description": "Yet Another Migrator: Flexible and customizable command line tool for migration with a trivial version management",
-    "type":"application",
+    "homepage": "http://github.com/Incubatio/yam",
+    "license": "GPLv3.0",
     "minimum-stability": "stable",
     "authors": [
         {
