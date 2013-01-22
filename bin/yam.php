@@ -1,5 +1,5 @@
 <?php
-// Example: ./bin/yam -e=prod -m=/bin/test -c=/test/test --environment=prod --migration_folder=/bin/test2 --config_folder=/test/test2 migrate up
+// Example: ./bin/yam -e=prod -m=/bin/test -c=/test/test --environment=prod --migration=/bin/test2 --config=/test/test2 migrate up
 
 /** CONSTANTS + AUTOLOADER **/
 // Define includes paths
@@ -7,13 +7,14 @@ define('ROOT_PATH',  dirname(dirname(__FILE__)));
 
 // Define environement
 $shortopts  = "e::" . "m::" . "c::";
-$longopts  = array( "environment::", "migration_folder::",  "config_folder::");
+$longopts  = array( "environment::", "migration::",  "config::");
 $opts = getopt($shortopts, $longopts);
 
 $options = array();
 $options['environment'] = array_key_exists('environment', $opts) ? $opts['environment'] : (array_key_exists('e', $opts) ? $opts['e'] : 'development');
-$options['config_folder'] = array_key_exists('config_folder', $opts) ? $opts['config_folder'] : (array_key_exists('c', $opts) ? $opts['m'] : ROOT_PATH . '/app/etc');
-$options['migration_folder'] = array_key_exists('migration_folder', $opts) ? $opts['migration_folder'] : (array_key_exists('m', $opts) ? $opts['m'] : './migrations');
+$options['config'] = array_key_exists('config', $opts) ? $opts['config'] : (array_key_exists('c', $opts) ? $opts['c'] : ROOT_PATH . '/app/etc');
+$options['migration'] = array_key_exists('migration', $opts) ? $opts['migration'] : (array_key_exists('m', $opts) ? $opts['m'] : './migrations');
+foreach($options as $k => $v) if(empty($v)) die('fatal error: "' . $k . '" option must not be empty, please provide a valid value or let the default one');
 
 $environments = array('development', 'production', 'testing', 'staging');
 foreach($environments as $e) {

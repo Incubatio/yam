@@ -47,10 +47,10 @@ class Main extends AListener {
         Console::necho('');
         Console::necho('usage: ./yam [opts] <command> [<args>]');
         Console::necho('');
-        Console::necho('opts: (options below require a value, example: --config_folder=app/etc or -c=app/etc)');
-        Console::necho('  --environment, -e       select the environment you wanna migrate in (usage: ./bin/yam --dev migrate');
-        Console::necho('  --config_folder, -c     to change config folder path (default is path/to/project/app/etc');
-        Console::necho('  --migration_folder, -m  to change migration folder path (default is path/to/project/migrations');
+        Console::necho('opts: (options below require a value, example: --config=app/etc or -c=app/etc)');
+        Console::necho('  --environment, -e  select the environment you wanna migrate in (usage: ./bin/yam --dev migrate');
+        Console::necho('  --config, -c       to change config folder path (default is path/to/project/app/etc');
+        Console::necho('  --migration, -m    to change migration folder path (default is ./migrations');
         Console::necho('');
         Console::necho('command:');
         Console::necho('  list      List migration contained in the migration folder');
@@ -91,126 +91,130 @@ class Main extends AListener {
         $options = $target->get_resource('options');
 
         $cmd = array_shift($args);
-        $test = array();
-        $migrationsPath = $options['migration_folder'];
-        if(empty($migrationsPath)) trigger_error('Please provide migration folder path either in the config file or directly in command line', E_USER_ERROR);
-        if(!file_exists($migrationsPath)) trigger_error('Migration folder not found at: ' . $migrationsPath, E_USER_ERROR);
-        $migrationList = $this->_listMigrations($migrationsPath);
-        $executedList = file_exists($migrationsPath . '/.yam') ? explode("\n", trim(file_get_contents($migrationsPath . '/.yam'))) : $executedList = array();
 
-        switch($cmd) {
-            // migrate to last version
-            case 'migrate':
-                $upToDate = false;
-                if(count($executedList) === 0) $this->_create($migrationsPath, $target->get_resources());
-                $param = count($args) ? array_shift($args) : null;
-                switch($param) {
-                    // execute next migration
-                    case 'up':
-                        $ms = array_diff($migrationList, $executedList);
-                        if(count($ms) > 0){ 
-                            $m = array_shift($ms); 
-                            $this->_launchScript('up', $migrationsPath . '/' . $m, $target->get_resources());
-                            file_put_contents($migrationsPath . '/.yam', $m . "\n", FILE_APPEND);
-                        } else $upToDate = true;
-                        break;
-                    // revert last migration
-                    case 'down':
-                            $m = array_pop($executedList);
-                            $this->_launchScript('down', $migrationsPath . '/' . $m, $target->get_resources());
-                            file_put_contents($migrationsPath . '/.yam', implode("\n", $executedList) . "\n");
-                            if(count($executedList) === 0 ) unlink($migrationsPath . '/.yam');
-                        break;
-                    // apply all migration
-                    case '':
-                        $ms = array_diff($migrationList, $executedList);
-                        if(count($ms) > 0) { 
-                            foreach($ms as $m) {
+        $test = array();
+        $migrationsPath = $options['migration'];
+        if(!$cmd) { 
+            $this->_help(); 
+        } else {
+            if(empty($migrationsPath) || !file_exists($migrationsPath)) die( '"' . $migrationsPath . '" not found, you need a valid migration folder path to use yam.');
+            $migrationList = $this->_listMigrations($migrationsPath);
+            $executedList = file_exists($migrationsPath . '/.yam') ? explode("\n", trim(file_get_contents($migrationsPath . '/.yam'))) : $executedList = array();
+
+            switch($cmd) {
+                // migrate to last version
+                case 'migrate':
+                    $upToDate = false;
+                    if(count($executedList) === 0) $this->_create($migrationsPath, $target->get_resources());
+                    $param = count($args) ? array_shift($args) : null;
+                    switch($param) {
+                        // execute next migration
+                        case 'up':
+                            $ms = array_diff($migrationList, $executedList);
+                            if(count($ms) > 0){ 
+                                $m = array_shift($ms); 
                                 $this->_launchScript('up', $migrationsPath . '/' . $m, $target->get_resources());
                                 file_put_contents($migrationsPath . '/.yam', $m . "\n", FILE_APPEND);
-                            }
-                        } else $upToDate = true;
-                        break;
-                    default:
-                        Console::necho('Invalid args: ' . $param);
-                        $this->_help();
-                            //if(isset
-                }
-                if($upToDate) Console::necho('Already up to date, nothing to migrate');
-                break;
-            case 'list':
-                foreach($migrationList as $m) {
-                    $data = explode('_', $m);
-                    if(count($data) === 2) {
-                        list($timestamp, $migrationName) = $data;
-                        $date = new DateTime();
-                        $date->setTimestamp($timestamp);
-                        Console::necho('# ' . $date->format('Y-m-d H:i') . ' -> ' . $migrationName);
+                            } else $upToDate = true;
+                            break;
+                        // revert last migration
+                        case 'down':
+                                $m = array_pop($executedList);
+                                $this->_launchScript('down', $migrationsPath . '/' . $m, $target->get_resources());
+                                file_put_contents($migrationsPath . '/.yam', implode("\n", $executedList) . "\n");
+                                if(count($executedList) === 0 ) unlink($migrationsPath . '/.yam');
+                            break;
+                        // apply all migration
+                        case '':
+                            $ms = array_diff($migrationList, $executedList);
+                            if(count($ms) > 0) { 
+                                foreach($ms as $m) {
+                                    $this->_launchScript('up', $migrationsPath . '/' . $m, $target->get_resources());
+                                    file_put_contents($migrationsPath . '/.yam', $m . "\n", FILE_APPEND);
+                                }
+                            } else $upToDate = true;
+                            break;
+                        default:
+                            Console::necho('Invalid args: ' . $param);
+                            $this->_help();
+                                //if(isset
                     }
-                }
-                break;
-            case 'history':
-                if(count($executedList) === 0) {
-                    Console::necho('No history');
-                } else {
-                    foreach($executedList as $m) {
+                    if($upToDate) Console::necho('Already up to date, nothing to migrate');
+                    break;
+                case 'list':
+                    foreach($migrationList as $m) {
                         $data = explode('_', $m);
                         if(count($data) === 2) {
                             list($timestamp, $migrationName) = $data;
                             $date = new DateTime();
                             $date->setTimestamp($timestamp);
-                            Console::necho('- ' . $date->format('Y-m-d H:i') . ' -> ' . $migrationName);
-                        } else {
-                            Console::necho('- ' . $m);
+                            Console::necho('# ' . $date->format('Y-m-d H:i') . ' -> ' . $migrationName);
                         }
                     }
-                }
-                break;
-            case 'status':
-            case 'current':
-                if(count($executedList) > 0) {
-                    $data = end($executedList);
-                    $data = explode('_', $data);
-                    if(count($data) > 1) {
-                        list($timestamp, $migrationName) = $data;
-                        $date = new DateTime();
-                        $date->setTimestamp($timestamp);
-                        $dateStr = $date->format('Y-m-d H:i') . ' -> ' ;
-                    } else { 
-                        $migrationName = array_shift($data);
-                        $dateStr = '';
+                    break;
+                case 'history':
+                    if(count($executedList) === 0) {
+                        Console::necho('No history');
+                    } else {
+                        foreach($executedList as $m) {
+                            $data = explode('_', $m);
+                            if(count($data) === 2) {
+                                list($timestamp, $migrationName) = $data;
+                                $date = new DateTime();
+                                $date->setTimestamp($timestamp);
+                                Console::necho('- ' . $date->format('Y-m-d H:i') . ' -> ' . $migrationName);
+                            } else {
+                                Console::necho('- ' . $m);
+                            }
+                        }
                     }
-                    Console::necho('Current revision: ' . $dateStr . $migrationName);
-                } else {
-                    Console::necho('No revision');
-                }
-                break;
-            case 'create':
-                $this->_create($migrationsPath, $target->get_resources());
-                break;
-            case 'drop':
-                if(file_exists($migrationsPath . '/.yam')) {
-                    $this->_launchScript('down', $migrationsPath . '/create.php', $target->get_resources());
-                    unlink($migrationsPath . '/.yam');
-                    Console::necho($migrationsPath . '/.yam has been droped');
-                } else {
-                    Console::necho('No revision file found (.yam is absent from the migration folder)');
-                }
-                break;
-            case 'new':
-                $param = count($args) ? array_shift($args) : null;
-                if(is_null($param)) {
-                    Console::necho('Please provide the name of migration');
-                } else {
-                    $date = new DateTime();
-                    $content = file_get_contents(ROOT_PATH . '/app/example_migration.php');
-                    $filename = $migrationsPath . '/' . $date->getTimestamp() . '_' . $param . '.php';
-                    file_put_contents($filename, $content);
-                }
+                    break;
+                case 'status':
+                case 'current':
+                    if(count($executedList) > 0) {
+                        $data = end($executedList);
+                        $data = explode('_', $data);
+                        if(count($data) > 1) {
+                            list($timestamp, $migrationName) = $data;
+                            $date = new DateTime();
+                            $date->setTimestamp($timestamp);
+                            $dateStr = $date->format('Y-m-d H:i') . ' -> ' ;
+                        } else { 
+                            $migrationName = array_shift($data);
+                            $dateStr = '';
+                        }
+                        Console::necho('Current revision: ' . $dateStr . $migrationName);
+                    } else {
+                        Console::necho('No revision');
+                    }
+                    break;
+                case 'create':
+                    $this->_create($migrationsPath, $target->get_resources());
+                    break;
+                case 'drop':
+                    if(file_exists($migrationsPath . '/.yam')) {
+                        $this->_launchScript('down', $migrationsPath . '/create.php', $target->get_resources());
+                        unlink($migrationsPath . '/.yam');
+                        Console::necho($migrationsPath . '/.yam has been droped');
+                    } else {
+                        Console::necho('No revision file found (.yam is absent from the migration folder)');
+                    }
+                    break;
+                case 'new':
+                    $param = count($args) ? array_shift($args) : null;
+                    if(is_null($param)) {
+                        Console::necho('Please provide the name of migration');
+                    } else {
+                        $date = new DateTime();
+                        $content = file_get_contents(ROOT_PATH . '/app/example_migration.php');
+                        $filename = $migrationsPath . '/' . $date->getTimestamp() . '_' . $param . '.php';
+                        file_put_contents($filename, $content);
+                    }
 
-                break;
-            default:
-                $this->_help();
+                    break;
+                default:
+                    $this->_help();
+            }
         }
     }
 

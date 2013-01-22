@@ -18,8 +18,8 @@ class Bootstrap extends Resource {
 
         // Init config loader and load configs
         $config_loader = new Config();
-        if(!file_exists($options['config_folder'])) trigger_error('Config folder: "' . $options['config_folder'] . '" does not exists.', E_USER_ERROR);
-        $configs = $config_loader->load_by_folder($options['config_folder'], true);
+        if(!file_exists($options['config'])) trigger_error('Config folder: "' . $options['config'] . '" does not exists.', E_USER_ERROR);
+        $configs = $config_loader->load_by_folder($options['config'], true);
 
         return $configs;
     }
