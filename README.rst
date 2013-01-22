@@ -11,7 +11,6 @@ Install
 Copy and update following:
 - app/bootstrap.php.dist to app/bootstrap.php (it actually load Doctrine ODM and ORM, feel free to change it)
 - app/etc/db.php.dist to app/etc/db.php (configured by default for the bootstrap.php.dist)
-- app/etc/application.php.dist to app/etc/application.php
 
 Testing
 =======

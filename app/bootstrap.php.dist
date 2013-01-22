@@ -5,11 +5,21 @@ use Incube\Config,
 
 class Bootstrap extends Resource {
 
+    protected function init_args() {
+        $argv = $this->_load('argv');
+        $args = array();
+        foreach($argv as $a) if(preg_match('#^\w+$#', $a)) $args[] = $a;
+        return $args;
+    }
+
     public function init_configs() {
+
+        $options = $this->_load('options');
 
         // Init config loader and load configs
         $config_loader = new Config();
-        $configs = $config_loader->load_by_folder(ROOT_PATH . '/app/etc', true);
+        if(!file_exists($options['config_folder'])) trigger_error('Config folder: "' . $options['config_folder'] . '" does not exists.', E_USER_ERROR);
+        $configs = $config_loader->load_by_folder($options['config_folder'], true);
 
         return $configs;
     }
@@ -70,6 +80,3 @@ class Bootstrap extends Resource {
     }
 
 }
-
-$resource = new Bootstrap();
-return $resource->load();
