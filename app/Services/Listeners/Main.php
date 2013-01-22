@@ -45,12 +45,12 @@ class Main extends AListener {
 
     protected function _help() {
         Console::necho('');
-        Console::necho('usage: ./migration [opts] <command> [<args>]');
+        Console::necho('usage: ./yam [opts] <command> [<args>]');
         Console::necho('');
-        Console::necho('opts: (IMPORTANT: options are yet not implemented)');
-        Console::necho('  --env     select the environment you wanna migrate in (usage: ./bin/yam --dev migrate');
-        Console::necho('  -config_path=path/to/config_folder to change config folder path (default is path/to/project/app/etc');
-        Console::necho('  -migrations_path=path/to/migrations_folder to change migration folder path (default is path/to/project/migrations');
+        Console::necho('opts: (options below require a value, example: --config_folder=app/etc or -c=app/etc)');
+        Console::necho('  --environment, -e       select the environment you wanna migrate in (usage: ./bin/yam --dev migrate');
+        Console::necho('  --config_folder, -c     to change config folder path (default is path/to/project/app/etc');
+        Console::necho('  --migration_folder, -m  to change migration folder path (default is path/to/project/migrations');
         Console::necho('');
         Console::necho('command:');
         Console::necho('  list      List migration contained in the migration folder');
@@ -86,11 +86,13 @@ class Main extends AListener {
 
         $odm =  $target->get_resource('odm');
         $orm =  $target->get_resource('orm');
-        $args = $target->get_resource('argv');
-        $config = $target->get_resource('configs')->get('application');
+        $args = $target->get_resource('args');
+        //$config = $target->get_resource('configs')->get('application');
+        $options = $target->get_resource('options');
+
         $cmd = array_shift($args);
         $test = array();
-        $migrationsPath = $config->get('migrations_path');
+        $migrationsPath = $options['migration_folder'];
         if(empty($migrationsPath)) trigger_error('Please provide migration folder path either in the config file or directly in command line', E_USER_ERROR);
         if(!file_exists($migrationsPath)) trigger_error('Migration folder not found at: ' . $migrationsPath, E_USER_ERROR);
         $migrationList = $this->_listMigrations($migrationsPath);
