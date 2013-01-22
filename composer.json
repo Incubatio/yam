@@ -18,19 +18,14 @@
     },
     "require": {
         "php": ">=5.3.0",
+        "incube/base": "dev-master",
         "doctrine/common":"2.3.*@stable",
         "doctrine/mongodb-odm": "1.0.0-BETA7",
         "doctrine/orm": "2.3.*@stable"
     },
     "autoload": {
         "classmap": [
-            "lib",
-            "app/Services/Listeners",
-            "vendor/doctrine/common/lib",
-            "vendor/doctrine/dbal/lib",
-            "vendor/doctrine/orm/lib",
-            "vendor/doctrine/mongodb/lib",
-            "vendor/doctrine/mongodb-odm/lib"
+            "app/Services/Listeners"
         ]
     }
 }

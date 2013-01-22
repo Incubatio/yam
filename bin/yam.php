@@ -12,13 +12,14 @@ date_default_timezone_set('Europe/Paris');
 
 // Define includes paths
 define('ROOT_PATH',  dirname(dirname(__FILE__)));
-define('LIB_PATH',  ROOT_PATH . '/lib');
+//define('LIB_PATH',  ROOT_PATH . '/lib');
 define('VENDOR_PATH',  ROOT_PATH . '/vendor');
-set_include_path( PATH_SEPARATOR . LIB_PATH . PATH_SEPARATOR . VENDOR_PATH);
+set_include_path( PATH_SEPARATOR . VENDOR_PATH);
 
 // set up autoloader
 //spl_autoload_register(function ($class) { include str_replace('\\', '/', $class) . '.php'; });
-include_once ROOT_PATH . '/app/autoload_register.php';
+// include_once ROOT_PATH . '/app/autoload_register.php';
+(@include_once __DIR__ . '/../vendor/autoload.php') || @include_once __DIR__ . '/../../../autoload.php';
 
 $resources = include_once(ROOT_PATH . '/app/bootstrap.php');
 array_shift($argv);
