@@ -1,7 +1,9 @@
 <?php
 use Incube\Config,
     Incube\Db\DataModel,
-    Incube\Resource;
+    Incube\Resource,
+    Nadeo\ManiaServer,
+    Nadeo\ApiClient;
 
 class Bootstrap extends Resource {
 
@@ -16,7 +18,6 @@ class Bootstrap extends Resource {
 
 
     protected function init_orm() {
-        // Init Doctrine ORM
         $config = $this->_load('configs')->get('db')->get(ENV)->get('orm');
 
         $ORMOptions = Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration($config->get('options')->to_array(), true);
@@ -24,8 +25,8 @@ class Bootstrap extends Resource {
     }
 
     protected function init_odm() {
-        // Init Doctrine ODM
         $config = $this->_load('configs')->get('db')->get(ENV)->get('odm');
+
 
         $ODMConfig = new \Doctrine\ODM\MongoDB\Configuration();
         if($config->has('options')) {
