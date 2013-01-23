@@ -27,5 +27,6 @@
         "classmap": [
             "app/Services/Listeners"
         ]
-    }
+    },
+    "bin": ["bin/yam","bin/yam.php"]
 }

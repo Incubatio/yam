@@ -53,6 +53,7 @@ class Main extends AListener {
         Console::necho('  --migration, -m    to change migration folder path (default is ./migrations');
         Console::necho('');
         Console::necho('command:');
+        Console::necho('  init      create migration folder and the initialising migration: init.php');
         Console::necho('  list      List migration contained in the migration folder');
         Console::necho('  history   List older migrations');
         Console::necho('  migrate   Update your database to the last state (create dbs if not exists)');
