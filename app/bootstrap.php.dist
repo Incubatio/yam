@@ -1,7 +1,7 @@
 <?php
 use Incube\Config,
-    Incube\Db\DataModel,
-    Incube\Resource;
+    Incube\Resource,
+    Incube\DataObject;
 
 class Bootstrap extends Resource {
 
@@ -12,22 +12,30 @@ class Bootstrap extends Resource {
         return $args;
     }
 
-    public function init_configs() {
+    public function init_config() {
 
         $options = $this->_load('options');
 
         // Init config loader and load configs
         $config_loader = new Config();
         if(!file_exists($options['config'])) trigger_error('Config folder: "' . $options['config'] . '" does not exists.', E_USER_ERROR);
-        $configs = $config_loader->load_by_folder($options['config'], true);
+        //$configs = $config_loader->load_by_folder($options['config'], true);
+        $config = $config_loader->load($options['config'], true);
 
-        return $configs;
+        //$result = array();
+        //foreach($configs->to_array() as $k => $config) { $result[$k] = $config[ENV]; }
+        //return DataObject::array_to_data_object($result);
+
+        $config = $config[$options['environment']];
+        return DataObject::array_to_data_object($config);
+
     }
 
 
     protected function init_orm() {
         // Init Doctrine ORM
-        $config = $this->_load('configs')->get('db')->get(ENV)->get('orm');
+        //$config = $this->_load('configs')->get('db')->get('orm');
+        $config = $this->_load('config')->get('orm');
 
         $ORMOptions = Doctrine\ORM\Tools\Setup::createAnnotationMetadataConfiguration($config->get('options')->to_array(), true);
         return Doctrine\ORM\EntityManager::create($config->get('connection')->to_array(), $ORMOptions);
@@ -35,7 +43,8 @@ class Bootstrap extends Resource {
 
     protected function init_odm() {
         // Init Doctrine ODM
-        $config = $this->_load('configs')->get('db')->get(ENV)->get('odm');
+        //$config = $this->_load('configs')->get('db')->get('odm');
+        $config = $this->_load('config')->get('odm');
 
         $ODMConfig = new \Doctrine\ODM\MongoDB\Configuration();
         if($config->has('options')) {

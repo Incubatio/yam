@@ -48,8 +48,10 @@ class Main extends AListener {
         Console::necho('usage: ./yam [opts] <command> [<args>]');
         Console::necho('');
         Console::necho('opts: (options below require a value, example: --config=app/etc or -c=app/etc)');
+        //Console::necho('  --config, -c       to change config folder path (default is path/to/project/app/etc');
+        Console::necho('  --config, -c       to change config file path (default is path/to/project/app/etc/db.php');
         Console::necho('  --environment, -e  select the environment you wanna migrate in (usage: ./bin/yam --dev migrate');
-        Console::necho('  --config, -c       to change config folder path (default is path/to/project/app/etc');
+        Console::necho('  --bootstrap, -b    to change bootstrap path (path/to/project/app/bootstrap.php');
         Console::necho('  --migration, -m    to change migration folder path (default is ./migrations');
         Console::necho('');
         Console::necho('command:');
