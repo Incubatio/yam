@@ -55,12 +55,13 @@ class Main extends AListener {
         Console::necho('  --migration, -m    to change migration folder path (default is ./migrations');
         Console::necho('');
         Console::necho('command:');
-        Console::necho('  init      create migration folder and the initialising migration: init.php');
-        Console::necho('  list      List migration contained in the migration folder');
-        Console::necho('  history   List older migrations');
-        Console::necho('  migrate   Update your database to the last state (create dbs if not exists)');
-        Console::necho('  create    Execute create.php::up() contained in the migration folder');
-        Console::necho('  drop      Execute create.php::down() contained in the migration folder');
+        Console::necho('  init              create migration folder and the initialising migration: init.php');
+        Console::necho('  list              List migration contained in the migration folder');
+        Console::necho('  history           List older migrations');
+        Console::necho('  migrate [<arg>]   Update your database to the last state (use create.php if first time).');
+        Console::necho('                    You can precise up or down as <arg> for more granularity');
+        Console::necho('  new <name>        Generate a new migration template in the migration folder named as <unixtime>_<name>.php');
+        Console::necho('  drop              Execute create.php::down() contained in the migration folder');
         Console::necho('');
     }
 
