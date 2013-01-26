@@ -29,7 +29,7 @@ foreach($environments as $e) {
 
 define('ENV', $options['environment']);
 ini_set('display_errors', true);
-error_reporting(E_ALL);
+error_reporting(-1);
 
 date_default_timezone_set('Europe/Paris');
 

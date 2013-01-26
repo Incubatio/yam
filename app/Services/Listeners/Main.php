@@ -74,6 +74,7 @@ class Main extends AListener {
                 $migrationList[] = $fileInfo->getFileName();
             }
         }
+        sort($migrationList);
         return $migrationList;
     }
 
