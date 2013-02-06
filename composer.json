@@ -25,7 +25,8 @@
     },
     "autoload": {
         "classmap": [
-            "app/Services/Listeners"
+            "app/Services/Listeners",
+            "lib"
         ]
     },
     "bin": ["bin/yam","bin/yam.php"]

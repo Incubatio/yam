@@ -22,7 +22,7 @@ class Main extends AListener {
         if(file_exists($path)) {
             $functions = include_once($path);
             //$this->orm->getConnection()->beginTransaction();
-            if(array_key_exists($name, $functions)) {
+            if(is_array($functions) && array_key_exists($name, $functions)) {
                 $functions[$name]($resources);
             } else {
                 Console::necho('function ' . $name . ' is missing');
@@ -32,15 +32,6 @@ class Main extends AListener {
         } else $res = false;
         Console::necho('');
         return $res;
-    }
-
-    protected function _create($migrationsPath, $resources) {
-        if(!file_exists($migrationsPath . '/.yam')) {
-            $this->_launchScript('up', $migrationsPath . '/create.php', $resources);
-            file_put_contents($migrationsPath . '/.yam', 'create.php' . "\n", FILE_APPEND);
-        } else {
-            Console::necho('Database has already been created, please drop before re-creating again');
-        }
     }
 
     protected function _help() {
@@ -92,13 +83,15 @@ class Main extends AListener {
         $odm =  $target->get_resource('odm');
         $orm =  $target->get_resource('orm');
         $args = $target->get_resource('args');
-        //$config = $target->get_resource('configs')->get('application');
+        $version = $target->get_resource('version');
         $options = $target->get_resource('options');
+
+        $migrationsPath = $options['migration'];
+
 
         $cmd = array_shift($args);
 
         $test = array();
-        $migrationsPath = $options['migration'];
         if(!$cmd) { 
             $this->_help(); 
         } else {
@@ -115,19 +108,20 @@ class Main extends AListener {
 
                 if(empty($migrationsPath) || !file_exists($migrationsPath)) die( '"' . $migrationsPath . '" not found, you need a valid migration folder path to use yam.');
                 $migrationList = $this->_listMigrations($migrationsPath);
-                $executedList = file_exists($migrationsPath . '/.yam') ? explode("\n", trim(file_get_contents($migrationsPath . '/.yam'))) : $executedList = array();
+                $executedList = $version->get_history();
 
                 switch($cmd) {
                     // migrate to last version
                     case 'migrate':
                         $upToDate = false;
-                        //$this->_create($migrationsPath, $target->get_resources());
-                        if(count($executedList) === 0) {
-                            $this->_create($migrationsPath, $target->get_resources());
-                            $executedList[] = 'create.php';
-                            file_put_contents($migrationsPath . '/.yam', 'create.php' . "\n");
-                        }
                         $param = count($args) ? array_shift($args) : null;
+                        //$this->_create($migrationsPath, $target->get_resources());
+                        if(count($executedList) === 0 && $param != 'down') {
+                            $this->_launchScript('up', $migrationsPath . '/create.php', $target->get_resources());
+                            $mtime = filemtime($migrationsPath . '/create.php');
+                            $version->add('create.php', $mtime);
+                            $executedList[] = 'create.php';
+                        }
                         switch($param) {
                             // execute next migration
                             case 'up':
@@ -135,7 +129,8 @@ class Main extends AListener {
                                 if(count($ms) > 0){ 
                                     $m = array_shift($ms); 
                                     $this->_launchScript('up', $migrationsPath . '/' . $m, $target->get_resources());
-                                    file_put_contents($migrationsPath . '/.yam', $m . "\n", FILE_APPEND);
+                                    $mtime = filemtime($migrationsPath . '/' . $m);
+                                    $version->add($m, $mtime);
                                 } else $upToDate = true;
                                 break;
                                 // revert last migration
@@ -143,9 +138,8 @@ class Main extends AListener {
                                 if(count($executedList) > 0){ 
                                     $m = array_pop($executedList);
                                     $this->_launchScript('down', $migrationsPath . '/' . $m, $target->get_resources());
-                                    file_put_contents($migrationsPath . '/.yam', implode("\n", $executedList) . "\n");
-                                    if(count($executedList) === 0 ) unlink($migrationsPath . '/.yam');
-                                } else $upToDate = true;
+                                    $version->remove();
+                                } else Console::necho('Empty history, nothing to downgrade'); 
                                 break;
                                 // apply all migration
                             case '':
@@ -153,7 +147,8 @@ class Main extends AListener {
                                 if(count($ms) > 0) { 
                                     foreach($ms as $m) {
                                         $this->_launchScript('up', $migrationsPath . '/' . $m, $target->get_resources());
-                                        file_put_contents($migrationsPath . '/.yam', $m . "\n", FILE_APPEND);
+                                        $mtime = filemtime($migrationsPath . '/' . $m);
+                                        $version->add($m, $mtime);
                                     }
                                 } else $upToDate = true;
                                 break;
@@ -211,12 +206,12 @@ class Main extends AListener {
                         }
                         break;
                     case 'drop':
-                        if(file_exists($migrationsPath . '/.yam')) {
+                        if(count($executedList) > 0) {
                             $this->_launchScript('down', $migrationsPath . '/create.php', $target->get_resources());
-                            unlink($migrationsPath . '/.yam');
-                            Console::necho($migrationsPath . '/.yam has been droped');
+                            $version->drop();
+                            Console::necho('create.php::down() has been successfully executed');
                         } else {
-                            Console::necho('No revision file found (.yam is absent from the migration folder)');
+                            Console::necho('No revision data found');
                         }
                         break;
                     case 'new':
