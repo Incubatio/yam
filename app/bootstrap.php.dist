@@ -1,6 +1,7 @@
 <?php
 use Incube\Config,
     Incube\Resource,
+    Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver,
     Incube\DataObject;
 
 class Bootstrap extends Resource {
@@ -53,8 +54,15 @@ class Bootstrap extends Resource {
             }
         }
 
+        $reader = new \Doctrine\Common\Annotations\SimpleAnnotationReader();
+        $reader->addNamespace($config->get('reader_namespace'));
+        AnnotationDriver::registerAnnotationClasses();
 
-        Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver::registerAnnotationClasses();
+        $driver = new AnnotationDriver($reader, $config->get('documents_path'));
+        if($config->has('driver')) {
+            foreach ($config->get('driver')->to_array() as $key => $value) { $driver->{"set" . ucfirst($key)}($value); }
+        }
+        $ODMConfig->setMetadataDriverImpl($driver);
 
         if($config->get('connection')->has('options')) {
             if($config->get('connection')->get('options')->has('bool')) {

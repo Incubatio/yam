@@ -2,25 +2,25 @@
 /***************************************** PRODUCTION *****************************************/
 $prod = array(
         'odm' => array(
-            'connection' => array(
-                'server' => '<serverhost>',
-                'options' => array(
-                    'persist'    => 'api',
-                    'replicaSet' => true, 
-                    'autoGenerateHydratorClasses'   => false,
-                    'autoGenerateProxyClasses'      => false,
+                'connection' => array(
+                    'server' => '<serverhost>',
+                    'options' => array(
+                        //'persist'    => 'api',
+                        //'replicaSet' => true, 
+                        //'autoGenerateHydratorClasses'   => false,
+                        //'autoGenerateProxyClasses'      => false,
+                        ),
                     ),
+                'options' => array(
+                    'proxyDir'          => ROOT_PATH . '/var/tmp/cache',
+                    'proxyNamespace'    => 'Proxies',
+                    'hydratorDir'       => ROOT_PATH . '/var/tmp/cache',
+                    'hydratorNamespace' => 'Hydrators',
+                    'defaultDB'         => 'almapi',
+                    ),
+                'reader_namespace' => 'Doctrine\ODM\MongoDB\Mapping\Annotations',
+                'documents_path' => ROOT_PATH . '/domain/documents',
                 ),
-            'options' => array(
-                'proxyDir'          => ROOT_PATH . '/var/tmp/cache',
-                'proxyNamespace'    => 'Proxies',
-                'hydratorDir'       => ROOT_PATH . '/var/tmp/cache',
-                'hydratorNamespace' => 'Hydrators',
-                'defaultDB'         => '<db name>',
-                ),
-            'reader' => array('defaultAnnotationNamespace' => 'Doctrine\ODM\MongoDB\Mapping\\'),
-            //'documents_path' => ROOT_PATH '/domain/documents',
-            ),
 
         'orm' => array(
                 'options' => array('entities_path' => ROOT_PATH . '/app/domain/entities'),
@@ -55,6 +55,6 @@ $dev['odm']['connection']['options'] = array_merge(
 
 $dev['orm']['connection']['user']      = 'root';
 $dev['orm']['connection']['password']  = '';
-$dev['orm']['connection']['dbname']    = '<db name>';
+$dev['orm']['connection']['dbname']    = 'miaou';
 
 return array('development' => $dev, 'testing' => $test, 'staging' => $stage, 'production' => $prod);
