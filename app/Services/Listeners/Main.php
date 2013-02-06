@@ -119,6 +119,7 @@ class Main extends AListener {
                         if(count($executedList) === 0 && $param != 'down') {
                             $this->_launchScript('up', $migrationsPath . '/create.php', $target->get_resources());
                             $mtime = filemtime($migrationsPath . '/create.php');
+                            $version->init();
                             $version->add('create.php', $mtime);
                             $executedList[] = 'create.php';
                         }

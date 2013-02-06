@@ -32,7 +32,7 @@ class Bootstrap extends Resource {
     }
 
 
-    protected function init_orm() {
+    public function init_orm() {
         // Init Doctrine ORM
         //$config = $this->_load('configs')->get('db')->get('orm');
         $config = $this->_load('config')->get('orm');
@@ -41,7 +41,7 @@ class Bootstrap extends Resource {
         return Doctrine\ORM\EntityManager::create($config->get('connection')->to_array(), $ORMOptions);
     }
 
-    protected function init_odm() {
+    public function init_odm() {
         // Init Doctrine ODM
         //$config = $this->_load('configs')->get('db')->get('odm');
         $config = $this->_load('config')->get('odm');
@@ -70,7 +70,7 @@ class Bootstrap extends Resource {
         return Doctrine\ODM\MongoDB\DocumentManager::create($connection, $ODMConfig);
     }
 
-    protected function init_event_manager() {
+    public function init_event_manager() {
 
         $manager = new \Incube\Event\EventManager();
         $fsIterator = new FilesystemIterator(ROOT_PATH .'/app/Services/Listeners');
@@ -86,6 +86,17 @@ class Bootstrap extends Resource {
             }
         }
         return $manager;
+    }
+
+    public function init_version() {
+        // Storing verions in File
+        //$options = $this->_load('options');
+        //$version = new \VersionManager\File($options['migration']);
+
+        // Storing version in doctrineOrm
+        $config = $this->_load('config')->to_array();
+        $version = new \VersionManager\DoctrineOrm($config);
+        return $version;
     }
 
 }
