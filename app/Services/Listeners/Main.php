@@ -60,9 +60,12 @@ class Main extends AListener {
         $migrationList = array();
         $fsIterator = new FilesystemIterator($path) ;
         foreach($fsIterator as $fileInfo) {
-            list($fileName, $ext) = explode('.',$fileInfo->getFileName());
-            if($fileInfo->isFile() && $ext == 'php') {
-                $migrationList[] = $fileInfo->getFileName();
+            $parts = explode('.',$fileInfo->getFileName());
+            if(count($parts) === 2) {
+                list($fileName, $ext) = $parts;
+                if($fileInfo->isFile() && $ext == 'php') {
+                    $migrationList[] = $fileInfo->getFileName();
+                }
             }
         }
         sort($migrationList);
