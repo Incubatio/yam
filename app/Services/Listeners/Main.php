@@ -10,7 +10,7 @@ use Incube\Event\IEvent,
 class Main extends AListener {
 
     protected static $_events = array(
-        'Incube\Application\EventApplication' => array(
+        'Incube\Event\Application' => array(
           'pre_main'  => 'init',
           'main'      => 'main',
           'post_main' => 'shutdown',
