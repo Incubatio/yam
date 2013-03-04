@@ -2,7 +2,7 @@
 namespace Services\Listeners;
 
 use Incube\Event\IEvent,
-    Incube\Tools\Console,
+    Incube\Base\Console,
     Incube\Event\AListener,
     DateTime,
     FilesystemIterator;

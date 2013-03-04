@@ -1,4 +1,5 @@
 <?php
+
 // Example: ./bin/yam -e=prod -m=/bin/test -c=/test/test --environment=prod --migration=/bin/test2 --config=/test/test2 migrate up
 
 /** CONSTANTS + AUTOLOADER **/
@@ -47,5 +48,5 @@ $bootstrap = new Bootstrap(array('options' => $options, 'argv' => $argv));
 $resources =  $bootstrap->load();
 
 
-$application = new \Incube\Application\EventApplication('shootmania_admin', $resources['event_manager']);
+$application = new \Incube\Event\Application('shootmania_admin', $resources['event_manager']);
 $application->set_resources($resources)->start();

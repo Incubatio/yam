@@ -1,8 +1,8 @@
 <?php
-use Incube\Config,
-    Incube\Resource,
+use Incube\Base\Config,
+    Incube\Base\Resource,
     Doctrine\ODM\MongoDB\Mapping\Driver\AnnotationDriver,
-    Incube\DataObject;
+    Incube\Base\DataObject;
 
 class Bootstrap extends Resource {
 
@@ -25,10 +25,10 @@ class Bootstrap extends Resource {
 
         //$result = array();
         //foreach($configs->to_array() as $k => $config) { $result[$k] = $config[ENV]; }
-        //return DataObject::array_to_data_object($result);
+        //return DataObject::from_array($result);
 
         $config = $config[$options['environment']];
-        return DataObject::array_to_data_object($config);
+        return DataObject::from_array($config);
 
     }
 
